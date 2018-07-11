@@ -12,4 +12,10 @@ Requirements:
 	c++ compiler
 	emscripten (emcc)
 
+## Installation
 
+```bash
+npm install 
+make 
+node test.js
+```
