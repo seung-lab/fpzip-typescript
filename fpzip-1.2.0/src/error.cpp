@@ -1,4 +1,4 @@
-#include "fpzip.h"
+#include "../inc/fpzip.h"
 
 fpzipError fpzip_errno;
 

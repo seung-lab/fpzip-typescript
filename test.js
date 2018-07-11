@@ -6,4 +6,4 @@ var data = new Uint8Array([0,0,0,0,0,0,0,0,0,0]);
 // console.log(lib);
 // console.log(lib.Fpzip);
 
-lib.Fpzip(data.buffer);
+var zip = lib.Fpzip(data.buffer);

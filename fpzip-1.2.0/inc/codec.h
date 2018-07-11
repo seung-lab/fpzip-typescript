@@ -6,6 +6,8 @@
 #define FPZIP_FP_EMUL 3
 #define FPZIP_FP_INT  4
 
+#define FPZIP_FP FPZIP_FP_SAFE
+
 #ifndef FPZIP_FP
   #error "floating-point mode FPZIP_FP not defined"
 #elif FPZIP_FP < 1 || FPZIP_FP > 4

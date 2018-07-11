@@ -29,17 +29,17 @@ using namespace std;
 
 /* PROTOTYPES */
 
-fpzipError fpzip_errno;
+// fpzipError fpzip_errno;
 
-const char* fpzip_errstr[] = {
-  "success",
-  "cannot read stream",
-  "cannot write stream",
-  "not an fpz stream",
-  "fpz format version not supported",
-  "precision not supported",
-  "memory buffer overflow",
-};
+// const char* fpzip_errstr[] = {
+//   "success",
+//   "cannot read stream",
+//   "cannot write stream",
+//   "not an fpz stream",
+//   "fpz format version not supported",
+//   "precision not supported",
+//   "memory buffer overflow",
+// };
 
 class Fpzip {
 protected:

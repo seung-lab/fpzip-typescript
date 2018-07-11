@@ -1,5 +1,5 @@
 #include <cassert>
-#include "rcqsmodel.h"
+#include "../inc/rcqsmodel.h"
 
 // table size for binary search
 #define TBLSHIFT 7
