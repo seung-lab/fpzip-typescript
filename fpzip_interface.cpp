@@ -26,12 +26,9 @@ using namespace std;
 #include "fpzip-1.2.0/inc/fpzip.h"
 #include "fpzip-1.2.0/inc/read.h"
 
-
 /* PROTOTYPES */
 
 class Fpzip {
-protected:
-  nbind::Buffer* compressedptr;
 public:
   unsigned int type;
   unsigned int prec;
@@ -47,8 +44,7 @@ public:
     ny = 0;
     nz = 0;
     nf = 0;
-    compressedptr = &buf;
-    decode_headers();
+    decode_headers(buf);
   }
 
   Fpzip(Fpzip &orig) {
@@ -58,11 +54,10 @@ public:
     ny = orig.ny;
     nz = orig.nz;
     nf = orig.nf;
-    compressedptr = orig.compressedptr;
   }
 
   ~Fpzip() {
-    free(compressedptr);
+  
   }
 
   size_t nvoxels() {
@@ -74,16 +69,19 @@ public:
     return nvoxels() * (type + 1) * sizeof(float);
   }
 
-  size_t get_type() {
-    return type;
-  }
+  size_t get_type() { return type; }
+  size_t get_prec() { return prec; }
+  size_t get_nx() { return nx; }
+  size_t get_ny() { return ny; }
+  size_t get_nz() { return nz; }
+  size_t get_nf() { return nf; }
 
-  void decode_headers() {
-    unsigned char* data = compressedptr->data();
+  void decode_headers(nbind::Buffer &buffer) {
+    unsigned char* data = buffer.data();
 
     char errorstr[128];
 
-    FPZ* fpz = fpzip_read_from_buffer(data);
+    FPZ* fpz = fpzip_read_from_buffer((void*)data);
     if (!fpzip_read_header(fpz)) {
       sprintf(errorstr, "cannot read header: %s\n", fpzip_errstr[fpzip_errno]);
       NBIND_ERR(errorstr);
@@ -97,7 +95,6 @@ public:
     nf = fpz->nf;
     
     fpzip_read_close(fpz);
-    free(fpz);
   }
 
   void check_length(nbind::Buffer &buf) {
@@ -111,19 +108,11 @@ public:
     }
   }
 
-  void decompress(nbind::Buffer buf) {
-    check_length(buf);
-
-    unsigned char *data = buf.data();
-
-    if (type == FPZIP_TYPE_FLOAT) {
-      dfpz<float>(data);
-    }
-    else {
-      dfpz<double>(data);
-    }
-
-    buf.commit();
+  void decompress(nbind::Buffer encoded, nbind::Buffer decoded) {
+    decode_headers(encoded);
+    check_length(decoded);
+    dfpz(encoded, decoded);
+    decoded.commit();
   }
 
   /* fpzip decompression + dekempression.
@@ -136,21 +125,22 @@ public:
   * DecodedImage *di = dekempress(buffer);
   * float* img = (float*)di->data;
   */
-  void dekempress(nbind::Buffer buf) {
-    check_length(buf);
+  void dekempress(nbind::Buffer encoded, nbind::Buffer decoded) {
+    decode_headers(encoded);
+    check_length(decoded);
 
-    unsigned char *data = buf.data();
+    dfpz(encoded, decoded);
 
-    if (type == FPZIP_TYPE_FLOAT) {
-      dfpz<float>(data);
-      dekempress_algo<float>( (float*)data );
+    unsigned char* decode_buffer = decoded.data();
+
+    if (type == FPZIP_TYPE_FLOAT) {  
+      dekempress_algo<float>( (float*)decode_buffer );
     }
     else {
-      dfpz<double>(data);
-      dekempress_algo<double>( (double*)data );
+      dekempress_algo<double>( (double*)decode_buffer );
     }
 
-    buf.commit();
+    decoded.commit();
   }
 
   /* Standard fpzip decompression. 
@@ -159,15 +149,20 @@ public:
   * DecodedImage *di = decompress(buffer);
   * float* img = (float*)di->data;
   */
-  template <typename T>
-  void dfpz(unsigned char *jsdata) {
+  void dfpz(nbind::Buffer encoded, nbind::Buffer decoded) {
     char errorstr[128];
     
-    T *data = (T*)jsdata;
- 
-    unsigned char* buffer = compressedptr->data();
+    unsigned char* buffer = encoded.data();
 
-    FPZ* fpz = fpzip_read_from_buffer((T*)buffer);
+    FPZ* fpz = fpzip_read_from_buffer((void*)buffer);
+
+    if (!fpzip_read_header(fpz)) {
+      sprintf(errorstr, "cannot read header: %s\n", fpzip_errstr[fpzip_errno]);
+      NBIND_ERR(errorstr);
+      return;
+    }
+
+    void* data = (void*)decoded.data();
 
     // perform actual decompression
     if (!fpzip_read(fpz, data)) {
@@ -177,8 +172,6 @@ public:
     }
 
     fpzip_read_close(fpz);
-
-    free(fpz);
   }
 
   template <typename T>
@@ -218,8 +211,16 @@ NBIND_CLASS(Fpzip) {
   method(nbytes);
   method(nvoxels);
   method(get_type);
+  method(get_prec);
+  method(get_nx);
+  method(get_ny);
+  method(get_nz);
+  method(get_nf);
   method(decompress);
   method(dekempress);
+
+  // debug
+  // method(buflen);
 }
 
 

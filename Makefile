@@ -2,4 +2,4 @@ all:
 	node-gyp configure build
 
 asm:
-	node-gyp configure build --asmjs=1
+	node-gyp configure build --asmjs=1 
