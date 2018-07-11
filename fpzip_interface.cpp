@@ -114,7 +114,7 @@ public:
     free(errorstr);
   }
 
-  void decompress(nbind::Buffer &buf) {
+  void decompress(nbind::Buffer buf) {
     check_length(buf);
 
     unsigned char *data = buf.data();
@@ -139,7 +139,7 @@ public:
   * DecodedImage *di = dekempress(buffer);
   * float* img = (float*)di->data;
   */
-  void dekempress(nbind::Buffer &buf) {
+  void dekempress(nbind::Buffer buf) {
     check_length(buf);
 
     unsigned char *data = buf.data();
