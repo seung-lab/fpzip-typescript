@@ -9,18 +9,20 @@ function print(x) {
 var filebytes = fs.readFileSync('./example.fpz');
 var data = new Uint8Array(filebytes);
 
-var zip = lib.Fpzip(data.buffer);
+console.log(data.join(", "))
 
-function decoded_data_buffer() {
-	if (zip.get_type() == 0) {
-		return new Float32Array(zip.nvoxels());
-	}
+// var zip = lib.Fpzip(data.buffer);
 
-	return new Float64Array(zip.nvoxels());
-}
+// function decoded_data_buffer() {
+// 	if (zip.get_type() == 0) {
+// 		return new Float32Array(zip.nvoxels());
+// 	}
 
-let out = decoded_data_buffer();
-zip.decompress(data.buffer, out.buffer);
+// 	return new Float64Array(zip.nvoxels());
+// }
 
-console.log(out.join(" "));
+// let out = decoded_data_buffer();
+// zip.decompress(data.buffer, out.buffer);
+
+// console.log(out.join(" "));
 

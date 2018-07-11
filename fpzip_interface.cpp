@@ -37,6 +37,15 @@ public:
   size_t nz;
   size_t nf;
 
+  Fpzip () {
+    type = 0;
+    prec = 0;
+    nx = 0;
+    ny = 0;
+    nz = 0;
+    nf = 0;
+  }
+
   Fpzip (nbind::Buffer buf) {
     type = 0;
     prec = 0;
@@ -207,6 +216,7 @@ public:
 };
 
 NBIND_CLASS(Fpzip) {
+  construct();
   construct<nbind::Buffer>();
   method(nbytes);
   method(nvoxels);
