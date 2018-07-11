@@ -29,18 +29,6 @@ using namespace std;
 
 /* PROTOTYPES */
 
-// fpzipError fpzip_errno;
-
-// const char* fpzip_errstr[] = {
-//   "success",
-//   "cannot read stream",
-//   "cannot write stream",
-//   "not an fpz stream",
-//   "fpz format version not supported",
-//   "precision not supported",
-//   "memory buffer overflow",
-// };
-
 class Fpzip {
 protected:
   nbind::Buffer* compressedptr;
@@ -98,6 +86,7 @@ public:
     FPZ* fpz = fpzip_read_from_buffer(data);
     if (!fpzip_read_header(fpz)) {
       sprintf(errorstr, "cannot read header: %s\n", fpzip_errstr[fpzip_errno]);
+      printf(errorstr, '\n');
       throw errorstr;
     }
     type = fpz->type;
@@ -118,6 +107,7 @@ public:
     if (buf.length() < nbytes()) {
       sprintf(errorstr, "Javascript TypedArray (%u bytes) should be at least %u bytes long.", 
         (unsigned int)buf.length(), (unsigned int)nbytes());
+      printf(errorstr, '\n');
       throw errorstr;
     }
 
@@ -185,6 +175,7 @@ public:
     // perform actual decompression
     if (!fpzip_read(fpz, data)) {
       sprintf(errorstr, "decompression failed: %s\n", fpzip_errstr[fpzip_errno]);
+      printf(errorstr, '\n');
       throw errorstr;
     }
 

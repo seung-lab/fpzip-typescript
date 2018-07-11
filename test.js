@@ -1,9 +1,8 @@
+var fs = require('fs');
 var nbind = require('nbind');
 var lib = nbind.init().lib;
  
-var data = new Uint8Array([0,0,0,0,0,0,0,0,0,0]);
-
-// console.log(lib);
-// console.log(lib.Fpzip);
+var filebytes = fs.readFileSync('./example.fpz');
+var data = new Uint8Array(filebytes);
 
 var zip = lib.Fpzip(data.buffer);
