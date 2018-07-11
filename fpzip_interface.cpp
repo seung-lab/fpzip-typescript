@@ -10,22 +10,8 @@
  *
  * Author: William Silversmith
  * Affiliation: Seung Lab, Princeton Neuroscience Institute
- * Date: June 2018
+ * Date: July 2018
  */
-
-/*
-Debugging compilation:
-
-emcc -g4 -std=c++11 -DFPZIP_FP=FPZIP_FP_FAST -DFPZIP_BLOCK_SIZE=0x1000 -DWITH_UNION \
-  -fPIC -Iinc src/read.cpp src/fpzip_emscripten.cpp src/rcdecoder.cpp src/rcqsmodel.cpp \
-  -s EXPORTED_FUNCTIONS="[ '_decompress', '_dekempress' ]" -s SIMD=0 -o fpzip.js
-
-Production compilation:
-
-emcc -O2 -s SIMD=1 -std=c++11 -DFPZIP_FP=FPZIP_FP_FAST -DFPZIP_BLOCK_SIZE=0x1000 -DWITH_UNION \
-  -fPIC -Iinc src/read.cpp src/fpzip_emscripten.cpp src/rcdecoder.cpp src/rcqsmodel.cpp \
-  -s EXPORTED_FUNCTIONS="[ '_decompress', '_dekempress' ]" -o fpzip.js
-*/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -66,7 +52,7 @@ public:
   size_t nz;
   size_t nf;
 
-  Fpzip (nbind::Buffer &buf) {
+  Fpzip (nbind::Buffer buf) {
     type = 0;
     prec = 0;
     nx = 0;
@@ -241,6 +227,7 @@ public:
 };
 
 NBIND_CLASS(Fpzip) {
+  construct<nbind::Buffer>();
   method(nbytes);
   method(nvoxels);
   method(get_type);
