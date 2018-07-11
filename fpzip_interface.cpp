@@ -81,13 +81,13 @@ public:
   void decode_headers() {
     unsigned char* data = compressedptr->data();
 
-    char *errorstr = new char[128];
+    char errorstr[128];
 
     FPZ* fpz = fpzip_read_from_buffer(data);
     if (!fpzip_read_header(fpz)) {
       sprintf(errorstr, "cannot read header: %s\n", fpzip_errstr[fpzip_errno]);
-      printf(errorstr, '\n');
-      throw errorstr;
+      NBIND_ERR(errorstr);
+      return;
     }
     type = fpz->type;
     prec = fpz->prec;
@@ -98,20 +98,17 @@ public:
     
     fpzip_read_close(fpz);
     free(fpz);
-    free(errorstr);
   }
 
   void check_length(nbind::Buffer &buf) {
-    char *errorstr = new char[512];
+    char errorstr[512];
 
     if (buf.length() < nbytes()) {
       sprintf(errorstr, "Javascript TypedArray (%u bytes) should be at least %u bytes long.", 
         (unsigned int)buf.length(), (unsigned int)nbytes());
-      printf(errorstr, '\n');
-      throw errorstr;
+      NBIND_ERR(errorstr);
+      return;
     }
-
-    free(errorstr);
   }
 
   void decompress(nbind::Buffer buf) {
@@ -164,7 +161,7 @@ public:
   */
   template <typename T>
   void dfpz(unsigned char *jsdata) {
-    char *errorstr = new char[128];
+    char errorstr[128];
     
     T *data = (T*)jsdata;
  
@@ -175,14 +172,13 @@ public:
     // perform actual decompression
     if (!fpzip_read(fpz, data)) {
       sprintf(errorstr, "decompression failed: %s\n", fpzip_errstr[fpzip_errno]);
-      printf(errorstr, '\n');
-      throw errorstr;
+      NBIND_ERR(errorstr);
+      return;
     }
 
     fpzip_read_close(fpz);
 
     free(fpz);
-    free(errorstr);
   }
 
   template <typename T>
